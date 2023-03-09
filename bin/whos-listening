@@ -1,0 +1,5 @@
+#! /bin/bash
+
+set -euo pipefail
+
+powershell.exe "(Get-NetTCPConnection -State Listen -LocalPort $1).OwningProcess"

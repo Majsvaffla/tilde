@@ -1,0 +1,37 @@
+#! /bin/bash
+
+set -euo pipefail
+
+host $SELENIUM_HOST > /dev/null || (
+    echo "Is \$SELENIUM_HOST set correctly?" && 
+    exit 1
+)
+
+CHROMEDRIVER_PATH="/mnt/c/Program Files (x86)/Google/Chromedriver/chromedriver.exe"
+MSEDGEDRIVER_PATH="/mnt/c/Program Files (x86)/Microsoft/WebDriver/msedgedriver.exe"
+GECKODRIVER_PATH="/mnt/c/Program Files/Mozilla Firefox/geckodriver-v0.27.0-win64/geckodriver.exe"
+SELENIUM_BIN_PATH="/mnt/c/Selenium/bin"
+SELENIUM_3_JAR_PATH="$SELENIUM_BIN_PATH/selenium-server-standalone-3.141.59.jar"
+# SELENIUM_4_JAR_PATH="$SELENIUM_BIN_PATH/selenium-server-4.0.0-rc-1.jar"
+
+# Turn the Windows firewall off
+admin netsh advfirewall set public state off
+
+cd $SELENIUM_BIN_PATH
+# Selenium 3
+exec java.exe \
+    -Dwebdriver.chrome.driver="$(wslpath -w "$CHROMEDRIVER_PATH")" \
+    -Dwebdriver.edge.driver="$(wslpath -w "$MSEDGEDRIVER_PATH")" \
+    -Dwebdriver.gecko.driver="$(wslpath -w "$GECKODRIVER_PATH")" \
+    -jar "$(wslpath -w "$SELENIUM_3_JAR_PATH")" \
+    -host "$SELENIUM_HOST" \
+    -port "4444"
+# Selenium 4
+# exec java.exe \
+#     -Dwebdriver.chrome.driver="$(wslpath -w "$CHROMEDRIVER_PATH")" \
+#     -Dwebdriver.edge.driver="$(wslpath -w "$MSEDGEDRIVER_PATH")" \
+#     -Dwebdriver.gecko.driver="$(wslpath -w "$GECKODRIVER_PATH")" \
+#     -jar "$(wslpath -w "$SELENIUM_4_JAR_PATH")" \
+#     standalone \
+#     --host "$SELENIUM_HOST" \
+#     --port "4444"

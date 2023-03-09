@@ -1,0 +1,7 @@
+#! /bin/bash
+
+set -euo pipefail
+
+pid_raw=$(cat -) || $1
+pid=$(echo $pid_raw | sed 's/[^0-9]*//g')
+admin taskkill.exe /F /PID $pid

@@ -1,0 +1,19 @@
+#! /bin/bash
+
+set -xeuo pipefail
+
+s=$(ls "/mnt/c/Program Files (x86)/Microsoft/Edge/Application")
+pattern='[0-9]+(\.[0-9]+){3}'
+
+[[ $s =~ $pattern ]]
+version=$BASH_REMATCH
+
+out_file=chromedriver_${version}_win32.zip
+echo The rest is not properly implemented yet...
+exit 1
+wget --quiet -O $out_file https://chromedriver.storage.googleapis.com/${version}/chromedriver_win32.zip
+
+# unzip $out_file
+# admin mv $out_file "/mnt/c/Program Files (x86)/Google/Chromedriver/chromedriver.exe"
+
+# rm $out_file

@@ -1,0 +1,50 @@
+#! /usr/bin/python3.7
+
+import os
+import subprocess
+import sys
+
+EXEC = "exec"
+DOUBLE_DASH = "--"
+AWS_VAULT_EXE = "aws-vault.exe"  # Has to be on $PATH in WSL
+CMD_EXE = "cmd.exe"
+
+# Ensure AWS Vault environment variables are shared between WSL and Windows
+AWS_VAULT_ENVIRONMENT_VARIABLES = (
+    k for k in os.environ.keys() if k.startswith("AWS_VAULT_")
+)
+WSLENV = os.environ.get("WSLENV")
+os.environ["WSLENV"] = ":".join(
+    s for s in [WSLENV, *AWS_VAULT_ENVIRONMENT_VARIABLES] if s
+)
+
+if EXEC in sys.argv:
+    exec_index = sys.argv.index(EXEC)
+    double_dash_index = (
+        sys.argv.index(DOUBLE_DASH) if DOUBLE_DASH in sys.argv else exec_index + 2
+    )
+
+    # Get AWS_* environment variables using the AWS Vault Windows binary
+    win_args = sys.argv[exec_index:double_dash_index]
+    win_process = subprocess.run(
+        [AWS_VAULT_EXE, *win_args, CMD_EXE, "/C", "set", "AWS_"],
+        stdout=subprocess.PIPE,
+        cwd="/mnt/c",
+        encoding="utf8",
+    )
+    if win_process.returncode != 0:
+        exit(win_process.returncode)
+    win_env = win_process.stdout.strip()
+
+    # Make a dict out of the environment string
+    wsl_env = {}
+    for line in win_env.splitlines():
+        k, *v = line.split("=")
+        wsl_env[k] = "".join(v)
+
+    # Exec command with arguments as is with AWS_* environment variables set
+    wsl_args = sys.argv[double_dash_index + 1 :]
+    os.execlpe(wsl_args[0], *wsl_args, {**os.environ, **wsl_env})
+else:
+    # Exec AWS Vault Windows binary with all arguments as is
+    os.execlp(AWS_VAULT_EXE, *sys.argv)
