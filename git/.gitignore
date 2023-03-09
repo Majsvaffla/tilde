@@ -1,0 +1,5 @@
+.venv
+.envrc
+.env
+.pgdump
+.vscode

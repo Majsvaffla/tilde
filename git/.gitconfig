@@ -1,0 +1,72 @@
+[user]
+    email = davidsvenson@outlook.com
+    name = David Svenson
+
+[core]
+    editor = code --wait
+    autocrlf = false
+    crlf = false
+    excludesfile = /home/david/.gitignore
+
+[diff]
+    noprefix = true
+    tool = code-difftool
+[difftool "code-difftool"]
+    cmd = code --wait --diff $LOCAL $REMOTE
+
+[commit]
+    template = /home/david/.git-commit-message-template.txt
+
+[push]
+    default = current
+
+[pull]
+    rebase = true
+
+[rebase]
+    updateRefs = true
+
+[alias]
+    abort = rebase --abort
+    continue = rebase --continue
+    skip = rebase --skip
+
+    stash = stash -u
+    delete = branch -D
+    please = push --force-with-lease
+    plz = please
+    plx = plz
+    amend = ca
+    reword = amend
+    clear = restore .
+    pop = stash pop
+    cp = cherry-pick
+    # llll = log
+    # lll = log --oneline
+    # ll = log origin/main..HEAD
+    # l = log --oneline origin/main..HEAD
+    lol = log --oneline
+
+    r = rebase
+    l = log origin/main..HEAD
+    s = switch
+    c = commit
+    f = fixup
+    d = diff
+    i = "!git add -A && git commit;"
+    o = reset HEAD^ --soft
+
+    ca = c --amend
+    cm = c -m
+    ll = pull
+    hs = push
+
+    recent = !git branch --sort=-committerdate | head -n10
+
+    wip = "!git add -A && git commit --no-verify -m WIP;"
+    wop = "!if [ $(git log -n1 --pretty=format:%B | grep WIP -c) -gt 0 ]; then git reset HEAD^; else echo No WIP commit to reset; fi"
+
+    fixup = "!fixup() { git rebase -i ${1:-origin/main} --autosquash; }; fixup"
+
+    sync = "!sync() { git fetch -a && git pull --rebase origin ${1:-main}; }; sync"
+    done = "!branch=$(git rev-parse --abbrev-ref HEAD); git switch main && git branch -D $branch;"
